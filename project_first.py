@@ -27,13 +27,9 @@ cl_10 = cr.fetchone()
 cl_11 = cr.fetchone()
 cl_12 = cr.fetchone()
 cl_13 = cr.fetchone()
-frame_mongo = pd.DataFrame(people)
 name_user = np.array([[cl_1[1],cl_2[1],cl_3[1],cl_4[1]],[cl_5[1],cl_6[1],cl_7[1],cl_8[1]],[cl_9[1],cl_10[1],cl_11[1],cl_12[1]]])
 data_pass = [[cl_1[6],cl_2[6],cl_3[6],cl_4[6],cl_5[6]],[cl_6[6],cl_7[6],cl_8[6],cl_9[6],cl_10[6],cl_11[1],cl_12[1]]]
 secart_password = np.array(["123456789","35651850","abdodolh14141"])
-printer = pprint.PrettyPrinter()#to print all_data beatyprinter
-production = clint.data_clint # type: ignore
-data_clint = production.data_clint
 class clint():
     def show_password(self):
         password_all = pd.DataFrame(data_pass)
@@ -127,49 +123,6 @@ class clint():
 
         else:
             print("i cant found it please put correct id".title())
-
-class data_mongodb(clint):
-
-    def insert_test_doc():
-        collection = test_tryed.tryed
-        text_doc = {
-        }
-        collection.insert_one(text_doc).inserted_id
-        print(collection)
-
-        
-    def creat_table(): 
-        data = []
-        name = ['abdo dolh','adel soliman','esraa adel','ahmed omer',
-                    'ziad yossif','omer adel','elon mark','elon mask','osama alzero']
-        age = [32,45,20,22,25,19,33,50,29]
-        married = [True,True,False,False,True,False,True,True,False]
-        salary = [15000,12000,6000,8000,4800,3000,6200,11000,1800]
-        country = ['canda','usa','iraq','france','german','egypt','india','german','soudia']
-        password = ['abdo14141', 'adel14141', 'esraa14141', 'ahmed14141', 'ziad14141', 'omer14141', 'elon14141', 'elon14141', 'osama14141']
-        skill = ['data anlysis','software engineer','cyber secirty','full-stack-frontend','php,js-express','mongo,react','cyber secuirty','machine learning','software engineer']
-        
-        for name,age,married,salary,country,password,skill in zip(name,age,married,salary,country,salary,skill):
-            doc = {'name':name, 'age':age, 'married':married, 'salary':salary,
-                    'country':country, 'password':password, 'skill':skill}
-            data.append(doc)
-        data_clint.insert_many(data)
-
-
-    def reader_data():
-        people = data_clint.find()
-        for data in people:
-            print(pd.DataFrame(people))
-
-    def find(name):
-        search = data_clint.find_one({'name':f'{name}'})
-        printer.pprint(search)
-
-    def get_id(person_id):
-        from bson.objectid import ObjectId
-        _id = ObjectId(person_id) # type: ignore
-        person = data_clint.find_one({'_id':_id})
-        printer.pprint(person)            
 
 class data_base(clint):
     def database_all(self):
@@ -331,7 +284,7 @@ while True:
                     data_base.delete_cl(cl_6[1])
 
                 elif reason == "skill cl1":
-                    a = data_clint
+                    print(cl_1[8])
 
                 elif reason == "skill cl2":
                     print(cl_2[8])
