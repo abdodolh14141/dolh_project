@@ -4,16 +4,9 @@ import numpy as np
 import pylint.lint
 import ascii_train
 import pandas as pd
-from pymongo import MongoClient
-import pprint
 db = sqlite3.connect("app.db")
 cr = db.cursor()
 cr = db.execute("select * from data_clint")
-mongo_url = f'mongodb+srv://abdodolh14141:abdodolh14141@data.2n75kkb.mongodb.net/test'
-clint = MongoClient(mongo_url) # type: ignore
-abs = clint.list_database_names()
-test_tryed = clint.tryed
-colection = test_tryed.list_collection_names()
 cl_1 = cr.fetchone()
 cl_2 = cr.fetchone()
 cl_3 = cr.fetchone()
