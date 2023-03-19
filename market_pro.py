@@ -36,12 +36,27 @@ class market():
         market.find_id()
 
     def rebot_clint():
-        rebot_masg = input('massage to rebot ==> ')
-        data_mongo.update_one({"user_id":"11"}, {"$addToSet":{"comment": f"{rebot_masg}"}})
-        print('sucess rebot')
+        try:
+            commint = sqlite_db.rebot
+            name_user22 = input('your name => '.title())
+            rebot = input('put your massage => '.title())
+            data =  {
+                'report':rebot,
+                'name':name_user22
+            }
+            commint.insert_one(data)
+        except ValueError as ev:
+            print(f'error => {ev}')
+        except EOFError as er:
+            print(f'error => {er}')
+        finally:
+            print('sucess')
+       
 
 class admin(market):
+
     def insert_test_doc():
+
         try:
             userID_input = input('user_id =+>')
             name1 = input('name =+>')
@@ -73,7 +88,6 @@ class admin(market):
 
         finally:
             print('success add')            
-
 
     def find_hack():
         hack = data_mongo.find({'skill' : 'cyber secuirty'})
@@ -107,9 +121,9 @@ class admin(market):
         print(frame.head(50))
         quision = input('changed what => ')
         if quision == 'name':
-            old_name = input('old name => ')
+            user_id = input('old name => ')
             new_name = input('new name => ')
-            myquery = { "name": old_name}
+            myquery = { "user_id": user_id}
             newvalues = { "$set": {"name": f"{new_name}"}}
             data_mongo.update_one(myquery, newvalues)
 
@@ -144,14 +158,14 @@ class admin(market):
         elif quision == 'password':
             user_id = int(input('user_id => '))
             new_pass = input('new password => ')
-            myquery = { "user_id": f"{user_id}"}
+            myquery = { "user_id": user_id}
             newvalues = { "$set": {"password": f"{new_pass}"}}
             data_mongo.update_one(myquery, newvalues)
 
         elif quision == 'country':
             user_id = int(input('user_id => '))
             new_sity = input('new country => ')
-            myquery = { "user_id": f"{user_id}"}
+            myquery = { "user_id": user_id}
             newvalues = { "$set": {"country": f"{new_sity}"}}
             data_mongo.update_one(myquery, newvalues)
 
@@ -159,31 +173,53 @@ class admin(market):
             print('not found please try agian')    
 
     def drop_admin():
-        user_id = input('put here user_id or name => '.strip())
-        if user_id == int:
-            data_mongo.delete_one({'user_id':f"{user_id}"})
-
-        else:
-            data_mongo.delete_one({'name':f"{user_id}"})
+        try:
+            user_id = input('put here user_id or name => '.strip())
+            if user_id == int:
+                data_mongo.delete_one({'user_id':user_id})
+            elif user_id == str:
+                data_mongo.delete_one({'name':f"{user_id}"})
+            else:
+                exit()
+        except ValueError as ev:
+            print(f'error ==> {ev}')
+        except EOFError as er:
+            print(f'error ==> {er}')
+        finally:
+            print('succes delet')
 
     def drop_phone():
         user_id = input('put here user_id or name => '.strip())
         if user_id == int:
-            phones.delete_one({'user_id':f"{user_id}"})
+            phones.delete_one({'user_id':user_id})
 
         else:
             phones.delete_one({'name':f"{user_id}"})
             
     def comment_help():
-        comment_help_1 = input("how can i help you problem ==>")
+        commint = sqlite_db.rebot
+        use = ['(write , input) or (read , show)'.title()]
+        print(use)
+        comment_help_1 = input("how can i help you problem ==> ".title())
         if comment_help_1 == 'show' or comment_help_1 == 'read':
-            add_data = data_mongo.find_one({'user_id':'11'})
-            printer.pprint(add_data)
+            add_data = commint.find({})
+            for row in add_data:
+                printer.pprint(row)
+            delet = input('do you want delet report => ')
+            if delet == 'yes':
+                name = input('name => ')
+                commint.delete_one({'name':f'{name}'})
+            else:
+                print('okey thanks you')
 
         elif comment_help_1 == 'input' or comment_help_1 == 'write':
-            rebot_masg = input('massage to rebot ==>')
-            data_mongo.update_one({"user_id":"11"}, {"$addToSet":{"comment": f"{rebot_masg}"}})
-            print('sucess rebot')
+            name_user22 = input('your name => ')
+            rebot = input('put your massage => '.title())
+            data =  {
+                'report':rebot,
+                'name':name_user22
+            }
+            commint.insert_one(data)
 
         else:
             exit()
@@ -194,7 +230,7 @@ class admin(market):
             id_find = input('user_id => ')
             new_pp = input('put any you want change => ')
             new_value = input('new value => ')
-            old = {'user_id':f"{id_find}"}
+            old = {'user_id':id_find}
             new_reslt = {'$set':{f"{new_pp}":f"{new_value}"}}
             phones.update_one(old, new_reslt)
 
@@ -207,665 +243,173 @@ class admin(market):
     def show_phones():
         print(frame_phone_all.to_string())
 
+class tool(market):
+    def tool_admin():
+        while True:
+                list_user_admin = np.array(['age','find hack','(delet or del) (admin or phone)','rebot',
+                                             'all_data (admin or phone)', '(update or change) (admin or phone)', 'add admin'])
+                print(list_user_admin)
+                help_1 = input('what can i help you => ')
+                if help_1 == 'all_data admin' or help_1 == 'database':
+                    print(frame)
+
+                elif help_1 == 'change admin' or help_1 == 'update admin':
+                    admin.replace()
+
+                elif help_1 == 'find hack':
+                    admin.find_hack()
+
+                elif help_1 == 'delet admin' or help_1 == 'del admin':
+                    admin.drop_admin()
+
+                elif help_1 == 'delet phone' or help_1 == 'del phone':
+                    admin.drop_phone()
+
+                elif help_1 == 'report' or help_1 == 'comment':
+                    admin.comment_help()
+
+                elif help_1 == 'age' or help_1 == 'find age':
+                    admin.get_age_arange()
+
+                elif help_1 == 'rebot' or help_1 == 'comment':
+                    admin.comment_help()
+
+                elif help_1 == 'update phone' or help_1 == 'change phone':
+                    admin.update_phones()
+
+                elif help_1 == 'all_data phone' or help_1 == 'phone':
+                    admin.show_phones()
+
+                elif help_1 == 'find phone' or help_1 == 'search':
+                    market.serach()
+
+                elif help_1 == 'add admin':
+                    admin.insert_test_doc()
+
+                elif help_1 == 'close' or help_1 == 'cls':
+                    exit()
+
+                else:
+                    print('error please try agian')
+                    break
+
+    def tool_clint():
+        while True:
+            list_use_clint = np.array(['all phone','find', 'rebot','find marka & search','report'])
+            print(list_use_clint)
+            qusison = input('what can halp you => ')
+            if qusison == 'all_data':
+                market.frame_all()
+            elif qusison == 'find':
+                market.find()
+            elif qusison == 'find marka' or qusison == 'search':
+                market.serach()
+            elif qusison == 'report':
+                market.rebot_clint()
+            else:
+                print("i can't understand you please try agian".title())
+                break
 
 while True:
     if __name__ == '__main__':
-        list_user_admin = np.array([['age','find hack','delet or del (admin or phone)'],
-            ['rebot', 'all_data (admin or phone)', '(update or change) (admin or phone)']])
         knowlage = input('admin or clint => ')
         if knowlage == 'admin':
             user = input('user_name => ')
-            if user == frame.iloc[0][2]:
-                pass_input = input('password => ')
-                if pass_input == frame.iloc[0][7]:
-                    print(list_user_admin)
-                    while True:
-                        help_1 = input('what can i help you => ')
-                        if help_1 == 'all_data admin' or help_1 == 'database':
-                            print(frame)
 
-                        elif help_1 == 'change admin' or help_1 == 'update admin':
-                            admin.replace()
+            if user == frame.iloc[0][2] or user == frame.iloc[1][2]\
+                or user == frame.iloc[2][2] or user == frame.iloc[3][2]\
+                or user == frame.iloc[4][2] or user == frame.iloc[5][2] or user == frame.iloc[6][2]\
+                or user == frame.iloc[7][2] or user == frame.iloc[8][2] or user == frame.iloc[9][2]\
+                or user == frame.iloc[10][2] or user == frame.iloc[11][2] or user == frame.iloc[12][2]\
+                or user == frame.iloc[13][2] or user == frame.iloc[14][2]: 
 
-                        elif help_1 == 'find hack':
-                            admin.find_hack()
+                if user == frame.iloc[0][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[0][7]:
+                        tool.tool_admin()
 
-                        elif help_1 == 'delet admin' or help_1 == 'del admin':
-                            admin.drop_admin()
+                elif user == frame.iloc[1][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[1][7]:
+                        tool.tool_admin()
 
-                        elif help_1 == 'delet phone' or help_1 == 'del phone':
-                            admin.drop_phone()
+                elif user == frame.iloc[2][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[2][7]:
+                        tool.tool_admin()
 
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
+                elif user == frame.iloc[3][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[3][7]:
+                        tool.tool_admin()
 
-                        elif help_1 == 'age' or help_1 == 'find age':
-                            admin.get_age_arange()
+                elif user == frame.iloc[4][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[4][7]:
+                        tool.tool_admin()
 
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
+                elif user == frame.iloc[5][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[5][7]:
+                        tool.tool_admin()
 
-                        elif help_1 == 'update phone' or help_1 == 'change phone':
-                            admin.update_phones()
+                elif user == frame.iloc[6][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[6][7]:
+                        tool.tool_admin()
 
-                        elif help_1 == 'all_data phone' or help_1 == 'phone':
-                            admin.show_phones()
+                elif user == frame.iloc[7][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[7][7]:
+                        tool.tool_admin()
 
-                        elif help_1 == 'find phone' or help_1 == 'search':
-                            market.serach()
+                elif user == frame.iloc[8][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[8][7]:
+                        tool.tool_admin()
 
-                        elif help_1 == 'close' or help_1 == 'cls':
-                            exit()
+                elif user == frame.iloc[9][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[9][7]:
+                        tool.tool_admin()
 
-                        else:
-                            print('error please try agian')
-                            break
-                else:
-                    exit()
+                elif user == frame.iloc[10][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[10][7]:
+                        tool.tool_admin()
 
-            elif user == frame.iloc[1][2]:
-                pass_input = input('password => ')
-                if pass_input == frame.iloc[1][7]:
-                    print(list_user_admin)
-                    while True:
-                        help_1 = input('what can i help you => ')
-                        if help_1 == 'all_data admin' or help_1 == 'database':
-                            print(frame)
+                elif user == frame.iloc[11][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[11][7]:
+                        tool.tool_admin()
 
-                        elif help_1 == 'change admin' or help_1 == 'update admin':
-                            admin.replace()
+                elif user == frame.iloc[12][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[12][7]:
+                        tool.tool_admin()
 
-                        elif help_1 == 'find hack':
-                            admin.find_hack()
-
-                        elif help_1 == 'delet admin' or help_1 == 'del admin':
-                            admin.drop_admin()
-
-                        elif help_1 == 'delet phone' or help_1 == 'del phone':
-                            admin.drop_phone()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'age' or help_1 == 'find age':
-                            admin.get_age_arange()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'update phone' or help_1 == 'change phone':
-                            admin.update_phones()
-
-                        elif help_1 == 'all_data phone' or help_1 == 'phone':
-                            admin.show_phones()
-
-                        elif help_1 == 'find phone' or help_1 == 'search':
-                            market.serach()
+                elif user == frame.iloc[13][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[13][7]:
+                        tool.tool_admin()
                         
-                        elif help_1 == 'close' or help_1 == 'cls':
-                            exit()
-
-                        else:
-                            print('error please try agian')
-                            break
+                elif user == frame.iloc[14][2]:
+                    pass_input = input('password => ')
+                    if pass_input == frame.iloc[14][7]:
+                        tool.tool_admin()
                 else:
-                    exit()
-
-            elif user == frame.iloc[1][2]:
-                pass_input = input('password => ')
-
-                if pass_input == frame.iloc[1][7]:
-                    print(list_user_admin)
-                    while True:
-                        help_1 = input('what can i help you => ')
-                        if help_1 == 'all_data admin' or help_1 == 'database':
-                            print(frame)
-
-                        elif help_1 == 'change admin' or help_1 == 'update admin':
-                            admin.replace()
-
-                        elif help_1 == 'find hack':
-                            admin.find_hack()
-
-                        elif help_1 == 'delet admin' or help_1 == 'del admin':
-                            admin.drop_admin()
-
-                        elif help_1 == 'delet phone' or help_1 == 'del phone':
-                            admin.drop_phone()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'age' or help_1 == 'find age':
-                            admin.get_age_arange()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'find phone' or help_1 == 'search':
-                            market.serach()
-
-                        elif help_1 == 'update phone' or help_1 == 'change phone':
-                            admin.update_phones()
-
-                        elif help_1 == 'all_data phone' or help_1 == 'phone':
-                            admin.show_phones()
-
-                        elif help_1 == 'close' or help_1 == 'cls':
-                            exit()
-
-                        else:
-                            print('error please try agian')
-                            break
-                else:
-                    exit()
-
-            elif user == frame.iloc[2][2]:
-                pass_input = input('password => ')
-                if pass_input == frame.iloc[2][7]:
-                    print(list_user_admin)
-                    while True:
-                        help_1 = input('what can i help you => ')
-                        if help_1 == 'all_data admin' or help_1 == 'database':
-                            print(frame)
-
-                        elif help_1 == 'change admin' or help_1 == 'update admin':
-                            admin.replace()
-
-                        elif help_1 == 'find hack':
-                            admin.find_hack()
-
-                        elif help_1 == 'delet admin' or help_1 == 'del admin':
-                            admin.drop_admin()
-
-                        elif help_1 == 'delet phone' or help_1 == 'del phone':
-                            admin.drop_phone()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'age' or help_1 == 'find age':
-                            admin.get_age_arange()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'update phone' or help_1 == 'change phone':
-                            admin.update_phones()
-
-                        elif help_1 == 'all_data phone' or help_1 == 'phone':
-                            admin.show_phones()
-                        elif help_1 == 'find phone' or help_1 == 'search':
-                            market.serach()
-
-                        elif help_1 == 'close' or help_1 == 'cls':
-                            exit()
-
-                        else:
-                            print('error please try agian')
-                            break
-                else:
-                    exit()
-
-            elif user == frame.iloc[3][2]:
-                pass_input = input('password => ')
-                if pass_input == frame.iloc[3][7]:
-                    print(list_user_admin)
-                    while True:
-                        help_1 = input('what can i help you => ')
-                        if help_1 == 'all_data admin' or help_1 == 'database':
-                            print(frame)
-
-                        elif help_1 == 'change admin' or help_1 == 'update admin':
-                            admin.replace()
-
-                        elif help_1 == 'find hack':
-                            admin.find_hack()
-
-                        elif help_1 == 'delet admin' or help_1 == 'del admin':
-                            admin.drop_admin()
-
-                        elif help_1 == 'delet phone' or help_1 == 'del phone':
-                            admin.drop_phone()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'age' or help_1 == 'find age':
-                            admin.get_age_arange()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'update phone' or help_1 == 'change phone':
-                            admin.update_phones()
-
-                        elif help_1 == 'all_data phone' or help_1 == 'phone':
-                            admin.show_phones()
-
-                        elif help_1 == 'find phone' or help_1 == 'search':
-                            market.serach()
-
-                        elif help_1 == 'close' or help_1 == 'cls':
-                            exit()
-
-                        else:
-                            print('error please try agian')
-                            break
-                else:
-                    exit()
-
-            elif user == frame.iloc[4][2]:
-                pass_input = input('password => ')
-                if pass_input == frame.iloc[4][7]:
-                    print(list_user_admin)
-                    while True:
-                        help_1 = input('what can i help you => ')
-                        if help_1 == 'all_data admin' or help_1 == 'database':
-                            print(frame)
-
-                        elif help_1 == 'change admin' or help_1 == 'update admin':
-                            admin.replace()
-
-                        elif help_1 == 'find hack':
-                            admin.find_hack()
-
-                        elif help_1 == 'delet admin' or help_1 == 'del admin':
-                            admin.drop_admin()
-
-                        elif help_1 == 'delet phone' or help_1 == 'del phone':
-                            admin.drop_phone()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'age' or help_1 == 'find age':
-                            admin.get_age_arange()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'update phone' or help_1 == 'change phone':
-                            admin.update_phones()
-
-                        elif help_1 == 'all_data phone' or help_1 == 'phone':
-                            admin.show_phones()
-
-                        elif help_1 == 'find phone' or help_1 == 'search':
-                            market.serach()
-
-                        elif help_1 == 'close' or help_1 == 'cls':
-                            exit()
-
-                        else:
-                            print('error please try agian')
-                            break
-                else:
-                    exit()
-
-            elif user == frame.iloc[5][2]:
-                pass_input = input('password => ')
-                if pass_input == frame.iloc[5][7]:
-                    print(list_user_admin)
-                    while True:
-                        help_1 = input('what can i help you => ')
-                        if help_1 == 'all_data admin' or help_1 == 'database':
-                            print(frame)
-
-                        elif help_1 == 'change admin' or help_1 == 'update admin':
-                            admin.replace()
-
-                        elif help_1 == 'find hack':
-                            admin.find_hack()
-
-                        elif help_1 == 'delet admin' or help_1 == 'del admin':
-                            admin.drop_admin()
-
-                        elif help_1 == 'delet phone' or help_1 == 'del phone':
-                            admin.drop_phone()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'age' or help_1 == 'find age':
-                            admin.get_age_arange()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'update phone' or help_1 == 'change phone':
-                            admin.update_phones()
-
-                        elif help_1 == 'all_data phone' or help_1 == 'phone':
-                            admin.show_phones()
-
-                        elif help_1 == 'close' or help_1 == 'cls':
-                            exit()
-
-                        elif help_1 == 'find phone' or help_1 == 'search':
-                            market.serach()
-
-                        else:
-                            print('error please try agian')
-                            break
-                else:
-                    exit()
-
-            elif user == frame.iloc[6][2]:
-                pass_input = input('password => ')
-                if pass_input == frame.iloc[6][7]:
-                    print(list_user_admin)
-                    while True:
-                        help_1 = input('what can i help you => ')
-                        if help_1 == 'all_data admin' or help_1 == 'database':
-                            print(frame)
-
-                        elif help_1 == 'change admin' or help_1 == 'update admin':
-                            admin.replace()
-
-                        elif help_1 == 'find hack':
-                            admin.find_hack()
-
-                        elif help_1 == 'delet admin' or help_1 == 'del admin':
-                            admin.drop_admin()
-
-                        elif help_1 == 'delet phone' or help_1 == 'del phone':
-                            admin.drop_phone()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'age' or help_1 == 'find age':
-                            admin.get_age_arange()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'update phone' or help_1 == 'change phone':
-                            admin.update_phones()
-
-                        elif help_1 == 'all_data phone' or help_1 == 'phone':
-                            admin.show_phones()
-                        
-                        elif help_1 == 'close' or help_1 == 'cls':
-                            exit()
-
-                        elif help_1 == 'find phone' or help_1 == 'search':
-                            market.serach()
-
-                        else:
-                            print('error please try agian')
-                            break
-                else:
-                    exit()
-
-            elif user == frame.iloc[7][2]:
-                pass_input = input('password => ')
-                if pass_input == frame.iloc[7][7]:
-                    print(list_user_admin)
-                    while True:
-                        help_1 = input('what can i help you => ')
-                        if help_1 == 'all_data admin' or help_1 == 'database':
-                            print(frame)
-
-                        elif help_1 == 'change admin' or help_1 == 'update admin':
-                            admin.replace()
-
-                        elif help_1 == 'find hack':
-                            admin.find_hack()
-
-                        elif help_1 == 'delet admin' or help_1 == 'del admin':
-                            admin.drop_admin()
-
-                        elif help_1 == 'delet phone' or help_1 == 'del phone':
-                            admin.drop_phone()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'age' or help_1 == 'find age':
-                            admin.get_age_arange()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'update phone' or help_1 == 'change phone':
-                            admin.update_phones()
-
-                        elif help_1 == 'all_data phone' or help_1 == 'phone':
-                            admin.show_phones()
-
-                        elif help_1 == 'close' or help_1 == 'cls':
-                            exit()
-
-                        elif help_1 == 'find phone' or help_1 == 'search':
-                            market.serach()
-
-                        else:
-                            print('error please try agian')
-                            break
-                else:
-                    exit()
-
-
-            elif user == frame.iloc[8][2]:
-                pass_input = input('password => ')
-                if pass_input == frame.iloc[8][7]:
-                    print(list_user_admin)
-                    while True:
-                        help_1 = input('what can i help you => ')
-                        if help_1 == 'all_data admin' or help_1 == 'database':
-                            print(frame)
-
-                        elif help_1 == 'change admin' or help_1 == 'update admin':
-                            admin.replace()
-
-                        elif help_1 == 'find hack':
-                            admin.find_hack()
-
-                        elif help_1 == 'delet admin' or help_1 == 'del admin':
-                            admin.drop_admin()
-
-                        elif help_1 == 'delet phone' or help_1 == 'del phone':
-                            admin.drop_phone()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'age' or help_1 == 'find age':
-                            admin.get_age_arange()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'update phone' or help_1 == 'change phone':
-                            admin.update_phones()
-
-                        elif help_1 == 'all_data phone' or help_1 == 'phone':
-                            admin.show_phones()
-
-                        elif help_1 == 'close' or help_1 == 'cls':
-                            exit()
-
-                        elif help_1 == 'find phone' or help_1 == 'search':
-                            market.serach()
-
-                        else:
-                            print('error please try agian')
-                            break
-                else:
-                    exit()
-
-            elif user == frame.iloc[9][2]:
-                pass_input = input('password => ')
-                if pass_input == frame.iloc[9][7]:
-                    print(list_user_admin)
-                    while True:
-                        help_1 = input('what can i help you => ')
-                        if help_1 == 'all_data admin' or help_1 == 'database':
-                            print(frame)
-
-                        elif help_1 == 'change admin' or help_1 == 'update admin':
-                            admin.replace()
-
-                        elif help_1 == 'find hack':
-                            admin.find_hack()
-
-                        elif help_1 == 'delet admin' or help_1 == 'del admin':
-                            admin.drop_admin()
-
-                        elif help_1 == 'delet phone' or help_1 == 'del phone':
-                            admin.drop_phone()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'age' or help_1 == 'find age':
-                            admin.get_age_arange()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'update phone' or help_1 == 'change phone':
-                            admin.update_phones()
-
-                        elif help_1 == 'all_data phone' or help_1 == 'phone':
-                            admin.show_phones()
-                        
-                        elif help_1 == 'close' or help_1 == 'cls':
-                            exit()
-
-                        elif help_1 == 'find phone' or help_1 == 'search':
-                            market.serach()
-
-                        else:
-                            print('error please try agian')
-                            break
-                else:
-                    exit()
-
-            elif user == frame.iloc[10][2]:
-                pass_input = input('password => ')
-
-                if pass_input == frame.iloc[10][7]:
-                    print(list_user_admin)
-                    while True:
-
-                        help_1 = input('what can i help you => ')
-                        if help_1 == 'all_data admin' or help_1 == 'database':
-                            print(frame)
-
-                        elif help_1 == 'change admin' or help_1 == 'update admin':
-                            admin.replace()
-
-                        elif help_1 == 'find hack':
-                            admin.find_hack()
-
-                        elif help_1 == 'delet admin' or help_1 == 'del admin':
-                            admin.drop_admin()
-
-                        elif help_1 == 'delet phone' or help_1 == 'del phone':
-                            admin.drop_phone()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'age' or help_1 == 'find age':
-                            admin.get_age_arange()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'update phone' or help_1 == 'change phone':
-                            admin.update_phones()
-
-                        elif help_1 == 'all_data phone' or help_1 == 'phone':
-                            admin.show_phones()
-
-                        elif help_1 == 'close' or help_1 == 'cls':
-                            exit()
-                        
-                        elif help_1 == 'find phone' or help_1 == 'search':
-                            market.serach()
-
-                        else:
-                            print('error please try agian')
-                            break
-                else:
-                    exit()
-
-            elif user == frame.iloc[11][2]:
-                pass_input = input('password => ')
-
-                if pass_input == frame.iloc[11][7]:
-                    print(list_user_admin)
-                    while True:
-
-                        help_1 = input('what can i help you => ')
-                        if help_1 == 'all_data admin' or help_1 == 'database':
-                            print(frame)
-
-                        elif help_1 == 'change admin' or help_1 == 'update admin':
-                            admin.replace()
-
-                        elif help_1 == 'find hack':
-                            admin.find_hack()
-
-                        elif help_1 == 'delet admin' or help_1 == 'del admin':
-                            admin.drop_admin()
-
-                        elif help_1 == 'delet phone' or help_1 == 'del phone':
-                            admin.drop_phone()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'age' or help_1 == 'find age':
-                            admin.get_age_arange()
-
-                        elif help_1 == 'rebot' or help_1 == 'comment':
-                            admin.comment_help()
-
-                        elif help_1 == 'update phone' or help_1 == 'change phone':
-                            admin.update_phones()
-
-                        elif help_1 == 'all_data phone' or help_1 == 'phone':
-                            admin.show_phones()
-
-                        elif help_1 == 'close' or help_1 == 'cls':
-                            exit()
-
-                        elif help_1 == 'find phone' or help_1 == 'search':
-                            market.serach()
-
-                        else:
-                            print('error please try agian')
-                            break
-                else:
-                    exit()
-
+                    print('wrong password please try agian')
+            
+            else:
+                exit()
+            
         elif knowlage == 'clint':
-            while True:
-                list_use_clint = np.array([['all phone','find'],['rebot','find marka or search']])
-                print(list_use_clint)
-                qusison = input('what can halp you => ')
-                if qusison == 'all_data':
-                    market.frame_all()
+            tool.tool_clint()
 
-                elif qusison == 'find':
-                    market.find()
-
-                elif qusison == 'find marka' or qusison == 'search':
-                    market.serach()
-
-                elif qusison == 'rebot':
-                    market.rebot_clint()
-        
-                else:
-                    print("i can't understand you please try agian".title())
-                    break
         else:
             print('not found answer please try agian'.title())
             break
+    else:
+        exit()
 
 
