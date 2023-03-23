@@ -6,17 +6,30 @@ import numpy as np
 load_dotenv(find_dotenv())
 printer = pprint.PrettyPrinter()
 clint = mongo_client.MongoClient('mongodb+srv://abdodolh14141:abdodolh14141@data.2n75kkb.mongodb.net/test')
+
+
 sqlite_db = clint.data_clint
 data_mongo = sqlite_db.sqlite3
 help_frame = data_mongo.find()
 frame = pd.DataFrame(help_frame)
-phones = sqlite_db.phones
-all_data = phones.find()
-frame_phone_all = pd.DataFrame(all_data, columns=['user_id', 'names', 'memory', 'stars'])
+
+
+phones = sqlite_db.new_phone
+all_data = phones.find({})
+frame_phone_all = pd.DataFrame(all_data, columns=['user_id','Model','Storage ','RAM ', 'Price'])
+frame_phone = pd.DataFrame(all_data)
+
+
+labtob = sqlite_db.labtob
+all_data_lab = labtob.find({})
+frame_lab = pd.DataFrame(all_data_lab)
+all_frame_lab = pd.DataFrame(all_data_lab, columns=['laptop_ID','Company','Product','Cpu','Price_euros'])
+
 class market():
 
     def find_id():
-        user_id = input('user_id => ')
+        print(frame_phone_all.to_string())
+        user_id = int(input('user_id => '))
         a = phones.find_one({'user_id':user_id})
         printer.pprint(a)
 
@@ -24,15 +37,11 @@ class market():
         print(frame_phone_all.to_string())
         market.find_id()
 
-    def find():
-        print(frame_phone_all.head(50))
-        market.find_id()
-
     def serach():
         print(frame_phone_all.to_string())
-        marka_find = input('name marka =>'.strip().title())
-        list_find = frame_phone_all.loc[frame_phone_all['names'].str.contains(f'{marka_find}')]
-        print(list_find.to_string())
+        marka_find = input('marka => ')
+        a = frame_phone.loc[frame_phone['Brand'].str.contains(f'{marka_find}')]
+        print(a.to_string())
         market.find_id()
 
     def rebot_clint():
@@ -51,6 +60,24 @@ class market():
             print(f'error => {er}')
         finally:
             print('sucess')
+
+class labtob_1(market):
+    def find_lab():
+        user_id = int(input('laptop_ID => '))
+        a = labtob.find_one({'laptop_ID': user_id })
+        printer.pprint(a)
+
+    def find_marka():
+        print(all_frame_lab.to_string())
+        marka_find = input('Company => ')
+        a = frame_lab.loc[frame_lab['Company'].str.contains(f'{marka_find}')]
+        print(a.to_string())
+        labtob_1.find_lab()
+    
+
+    def all_lab():
+        print(all_frame_lab.to_string())
+        labtob_1.find_lab()
        
 
 class admin(market):
@@ -87,7 +114,37 @@ class admin(market):
             print(f' error => {er}')
 
         finally:
-            print('success add')            
+            print('success add')
+
+    def add_phone():
+        try:
+            model_new = input('model new phone => ')
+            brand_new = input('brand new phone => ')
+            storage_new = input('storage new phone => ')
+            ram_new = input('ram new phone => ')
+            batter_new = int(input('battery new phone => '))
+            screen_new = input('screen size (inches) => ')   
+            canera_new = input('camerea (MP) => ')
+            price_new = int(input('price => '))
+            user_new = int(input('user_id => '))
+            data = {
+                'Brand':brand_new,
+                'Model':model_new,
+                'Storage':storage_new,
+                'RAM':ram_new,
+                'Screen Size (inches)':screen_new,
+                'Camera (MP)':canera_new,
+                'Battery Capacity (mAh)':batter_new,
+                'Price':price_new,
+                'user_id':user_new
+            }
+            phones.insert_one(data)
+
+        except Exception as ex:
+            print(f'error => {ex}')
+        finally:
+            print('success add phone'.title())
+
 
     def find_hack():
         hack = data_mongo.find({'skill' : 'cyber secuirty'})
@@ -98,11 +155,8 @@ class admin(market):
         a = data_mongo.count_documents(filter={})
         print('number of people count',a)
 
-    def find():
-        print(frame)
-        user_id = input('user_id => ')
-        answer = phones.find_one({'user_id':user_id})
-        printer.pprint(answer)
+    def find_phone():
+        market.find_id
         
 
     def get_age_arange():
@@ -240,24 +294,56 @@ class admin(market):
         finally:
             print('sucess change')
 
+    def update_lab():
+        try:
+            print(all_frame_lab.to_string())
+            id_find = input('laptop_ID => ')
+            new_pp = input('put any you want change => ')
+            new_value = input('new value => ')
+            old = {'laptop_ID':id_find}
+            new_reslt = {'$set':{f"{new_pp}":f"{new_value}"}}
+            phones.update_one(old, new_reslt)
+
+        except EOFError as er:
+            print(f'error => {er}')
+
+        finally:
+            print('sucess change')
+
     def show_phones():
         print(frame_phone_all.to_string())
+        market.find_id()
+
+    def show_lab():
+        print(all_frame_lab.to_string())
+        labtob_1.find_lab()
 
 class tool(market):
     def tool_admin():
         while True:
                 list_user_admin = np.array(['age','find hack','(delet or del) (admin or phone)','rebot',
-                                             'all_data (admin or phone)', '(update or change) (admin or phone)', 'add admin'])
+                                             'all_data (admin or phone)', '(update or change) (admin or phone)',
+                                               'add (admin or phone)', 'update labtob', 'show labtob'])
                 print(list_user_admin)
                 help_1 = input('what can i help you => ')
+                
                 if help_1 == 'all_data admin' or help_1 == 'database':
                     print(frame)
 
                 elif help_1 == 'change admin' or help_1 == 'update admin':
                     admin.replace()
 
+                elif help_1 == 'update labtob':
+                    admin.update_lab()
+
+                elif help_1 == 'show labtob':
+                    admin.show_lab()
+
                 elif help_1 == 'find hack':
                     admin.find_hack()
+
+                elif help_1 == 'add phone':
+                    admin.add_phone()
 
                 elif help_1 == 'delet admin' or help_1 == 'del admin':
                     admin.drop_admin()
@@ -295,20 +381,50 @@ class tool(market):
 
     def tool_clint():
         while True:
-            list_use_clint = np.array(['all phone','find', 'rebot','find marka & search','report'])
-            print(list_use_clint)
-            qusison = input('what can halp you => ')
-            if qusison == 'all_data':
-                market.frame_all()
-            elif qusison == 'find':
-                market.find()
-            elif qusison == 'find marka' or qusison == 'search':
-                market.serach()
-            elif qusison == 'report':
-                market.rebot_clint()
+            elc = input('phones or labtob => '.title())
+            if elc == 'phones' or elc == 'phone':
+                list_use_clint = np.array(['all phone','find', 'rebot','find marka & search','report'])
+                print(list_use_clint)
+                qusison = input('what can halp you => ')
+
+                if qusison == 'all phone' or qusison == 'phones':
+                    market.frame_all()
+
+                elif qusison == 'find':
+                    market.find_id()
+
+                elif qusison == 'find marka' or qusison == 'search':
+                    market.serach()
+
+                elif qusison == 'report':
+                    market.rebot_clint()
+
+                else:
+                    print("i can't understand you please try agian".title())
+                    break
+
+            elif elc == 'labtob' or elc == 'lab':
+                list_use_clint = np.array(['all labtob or labtobs','find lab', 'rebot','find marka lab & search lab','report'])
+                print(list_use_clint)
+                qusison = input('what can halp you => ')
+
+                if qusison == 'all labtob' or qusison == 'labtobs':
+                    labtob_1.all_lab()
+
+                elif qusison == 'find lab':
+                    labtob_1.find_lab()
+
+                elif qusison == 'find marka lab' or qusison == 'search lab':
+                    labtob_1.find_marka()
+
+                elif qusison == 'report':
+                    market.rebot_clint()
+
+                else:
+                    print("i can't understand you please try agian".title())
+                    break
             else:
-                print("i can't understand you please try agian".title())
-                break
+                exit()
 
 while True:
     if __name__ == '__main__':
