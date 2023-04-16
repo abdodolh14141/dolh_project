@@ -3,6 +3,9 @@ from dotenv import load_dotenv, find_dotenv
 import pandas as pd
 import pprint
 import numpy as np
+import re
+from bson.objectid import ObjectId
+
 load_dotenv(find_dotenv())
 printer = pprint.PrettyPrinter()
 clint = mongo_client.MongoClient('mongodb+srv://abdodolh14141:abdodolh14141@data.2n75kkb.mongodb.net/test')
@@ -10,72 +13,91 @@ clint = mongo_client.MongoClient('mongodb+srv://abdodolh14141:abdodolh14141@data
 
 sqlite_db = clint.data_clint
 data_mongo = sqlite_db.sqlite3
-help_frame = data_mongo.find()
-frame = pd.DataFrame(help_frame)
+help_frame = data_mongo.find().sort('user_id')
+df_user = pd.DataFrame(help_frame)
 
 
 phones = sqlite_db.new_phone
 all_data = phones.find()
-frame_phone_all = pd.DataFrame(all_data, columns=['user_id','Model','Storage ','RAM ', 'Price'])
-frame_phone = pd.DataFrame(all_data)
+df_phone = pd.DataFrame(all_data)
 
 
-labtob = sqlite_db.labtob
-all_data_lab = labtob.find()
-frame_all_data_lab = pd.DataFrame(all_data_lab, columns=['laptop_ID','Company','Product','Cpu','Price_euros'])
-frame_lab = pd.DataFrame(all_data_lab)
+laptop = sqlite_db.labtob
+all_data_lab = laptop.find().sort('laptop_ID')
+df_lap = pd.DataFrame(all_data_lab)
 
 class market():
 
     def find_id():
-        user_id = int(input('user_id => '))
-        a = phones.find_one({'user_id':user_id})
-        printer.pprint(a)
+        try:
+            ID_phone = int(input('user_id => '))
+            answer1 = phones.find_one({'user_id':ID_phone})
+
+        except EOFError as er:
+            print(f'error => {er}')
+
+        except ValueError as ev:
+            print(f'error => {ev}')
+
+        finally:
+            printer.pprint(answer1)
 
     def frame_all():
-        print(frame_phone_all.to_string())
+        print(df_all_phone.to_string())
         market.find_id()
 
-    def serach():
-        print(frame_phone_all.to_string())
-        marka_find = input('marka => ')
-        a = frame_phone.loc[frame_phone['Brand'].str.contains(f'{marka_find}')]
-        print(a.to_string())
+    def search_phone():
+        print(df_phone.to_string(index=False, columns=['user_id', 'Brand', 'Model', 'Storage ', 'RAM ']))
+        find1 = input('marka => ')
+        answer = df_phone.loc[df_phone['Brand'].str.contains(find1, regex=True, flags=re.I)]
+        print(answer.to_string(index=False, columns=['user_id', 'Brand', 'Model', 'Storage ', 'RAM ']))
         market.find_id()
-
+        
     def rebot_clint():
         try:
             commint = sqlite_db.rebot
-            name_user22 = input('your name => '.title())
-            rebot = input('put your massage => '.title())
+            name22 = input('your name => '.title())
+            massage = input('put your massage => '.title())
             data =  {
-                'report':rebot,
-                'name':name_user22
+                'name':name22,
+                'report':massage
             }
             commint.insert_one(data)
+
         except ValueError as ev:
             print(f'error => {ev}')
+
         except EOFError as er:
             print(f'error => {er}')
+
         finally:
             print('sucess')
 
 class labtob_1(market):
     def find_lab():
-        user_id = int(input('laptop_ID => '.strip()))
-        a = labtob.find_one({'laptop_ID':user_id})
-        printer.pprint(a)
+        try:
+            ID_lap_find = int(input('laptop_ID => '))
+            a = df_lap.iloc[ID_lap_find]
 
-    def find_marka():
-        print(frame_all_data_lab.to_string())
-        marka_find_l = input('marka => ')
-        answer = frame_lab.loc[frame_lab['Company'].str.contains(f"{marka_find_l}")]
-        print(answer.to_string())
+        except EOFError as er:
+            print(f'error => {er}')
+
+        except ValueError as ev:
+            print(f'error => {ev}')
+
+        finally:
+            printer.pprint(a)
+
+    def search_laptop():
+        print(df_lap.to_string(index=False, columns=['laptop_ID', 'Company', 'Product', 'Cpu', 'Ram', 'Gpu']))
+        find_l = str(input('marka => '.title()))
+        answer = df_lap.loc[df_lap['Company'].str.contains(find_l, regex=True, flags=re.I)]
+        print(answer.to_string(index=False, columns=['laptop_ID', 'Company', 'Product', 'Cpu', 'Ram', 'Gpu']))
         labtob_1.find_lab()
     
 
     def all_lab():
-        print(frame_all_data_lab.to_string())
+        print(df_all_lap.to_string())
         labtob_1.find_lab()
        
 
@@ -84,15 +106,17 @@ class admin(market):
     def insert_test_doc():
 
         try:
-            userID_input = input('user_id =+>')
-            name1 = input('name =+>')
-            age1 = input('age =+>')
-            married1 = input('married =+>')
-            salary1 = input('salary =+>')
-            country1 = input('country =+>')
-            password1 = input('password =+>')
-            genter1 = input('genter =+>')
-            skill1 = input('skill =+>')
+
+            userID_input = input('user_id =+> '.title())
+            name1 = input('name =+> '.title())
+            age1 = int(input('age =+> '))
+            married1 = input('married =+> ')
+            salary1 = int(input('salary =+> '))
+            country1 = input('country =+> ')
+            password1 = input('password =+> ')
+            genter1 = input('genter =+> ')
+            skill1 = input('skill =+> ')
+
             data = {
                 'user_id':userID_input,
                 'name':name1,
@@ -104,6 +128,7 @@ class admin(market):
                 'genter':genter1,
                 'skill':skill1
                 }
+
             data_mongo.insert_one(data)
 
         except ValueError as ev:
@@ -116,31 +141,36 @@ class admin(market):
             print('success add')
 
     def add_phone():
+
         try:
+
             model_new = input('model new phone => ')
             brand_new = input('brand new phone => ')
             storage_new = input('storage new phone => ')
             ram_new = input('ram new phone => ')
             batter_new = int(input('battery new phone => '))
             screen_new = input('screen size (inches) => ')   
-            canera_new = input('camerea (MP) => ')
+            camera_new = input('camerea (MP) => ')
             price_new = int(input('price => '))
             user_new = int(input('user_id => '))
+
             data = {
+                'user_id':user_new,
                 'Brand':brand_new,
                 'Model':model_new,
-                'Storage':storage_new,
-                'RAM':ram_new,
+                'Storage ':storage_new,
+                'RAM ':ram_new,
                 'Screen Size (inches)':screen_new,
-                'Camera (MP)':canera_new,
+                'Camera (MP)':screen_new,
                 'Battery Capacity (mAh)':batter_new,
-                'Price':price_new,
-                'user_id':user_new
+                'Price':price_new
             }
-            phones.insert_one(data)
+            
+            phones.insert_one(data).inserted_id()
 
         except Exception as ex:
             print(f'error => {ex}')
+
         finally:
             print('success add phone'.title())
 
@@ -150,13 +180,6 @@ class admin(market):
         for row in hack:
             printer.pprint(row)
 
-    def count_of_people():
-        a = data_mongo.count_documents(filter={})
-        print('number of people count',a)
-
-    def find_phone():
-        market.find_id
-        
     def get_age_arange():
         min_age = int(input('put min age => '.strip()))
         max_age = int(input('put max age => '.strip()))
@@ -170,60 +193,69 @@ class admin(market):
 
 
     def replace():
-        print(frame.head(50))
+        print(df_user.head(50))
         quision = input('changed what => ')
-        if quision == 'name':
-            user_id = input('old name => ')
-            new_name = input('new name => ')
-            myquery = { "user_id": user_id}
-            newvalues = { "$set": {"name": f"{new_name}"}}
-            data_mongo.update_one(myquery, newvalues)
+        try:
+            if quision == 'name':
+                user_id = input('old name => ')
+                new_name = input('new name => ')
+                myquery = { "user_id": user_id}
+                newvalues = { "$set": {"name": f"{new_name}"}}
+                data_mongo.update_one(myquery, newvalues)
 
-        elif quision == 'age':
-            user_id = int(input('user_id => '))
-            new_age = input('new age => ')
-            myquery = { "user_id": user_id}
-            newvalues = { "$set": {"age": new_age}}
+            elif quision == 'age':
+                user_id = int(input('user_id => '))
+                new_age = input('new age => ')
+                myquery = { "user_id": user_id}
+                newvalues = { "$set": {"age": new_age}}
 
-            data_mongo.update_one(myquery, newvalues)
-        elif quision == 'salary':
-            user_id = int(input('user_id => '))
-            new_salary = input('new name => ')
-            myquery = { "user_id": user_id}
-            newvalues = { "$set": {"salary": new_salary}}
-            data_mongo.update_one(myquery, newvalues)
+                data_mongo.update_one(myquery, newvalues)
+            elif quision == 'salary':
+                user_id = int(input('user_id => '))
+                new_salary = input('new name => ')
+                myquery = { "user_id": user_id}
+                newvalues = { "$set": {"salary": new_salary}}
+                data_mongo.update_one(myquery, newvalues)
 
-        elif quision == 'skill':
-            user_id = int(input('user_id => '))
-            new_skill = input('new skill => ')
-            myquery = { "user_id": user_id}
-            newvalues = { "$set": {"skill": f"{new_skill}"}}
-            data_mongo.update_one(myquery, newvalues)
+            elif quision == 'skill':
+                user_id = int(input('user_id => '))
+                new_skill = input('new skill => ')
+                myquery = { "user_id": user_id}
+                newvalues = { "$set": {"skill": f"{new_skill}"}}
+                data_mongo.update_one(myquery, newvalues)
 
-        elif quision == 'married':
-            user_id = int(input('user_id => '))
-            new_married = input('new married => ')
-            myquery = { "user_id": user_id}
-            newvalues = { "$set": {"married": new_married}}
-            data_mongo.update_one(myquery, newvalues)
+            elif quision == 'married':
+                user_id = int(input('user_id => '))
+                new_married = input('new married => ')
+                myquery = { "user_id": user_id}
+                newvalues = { "$set": {"married": new_married}}
+                data_mongo.update_one(myquery, newvalues)
 
-        elif quision == 'password':
-            user_id = int(input('user_id => '))
-            new_pass = input('new password => ')
-            myquery = { "user_id": user_id}
-            newvalues = { "$set": {"password": f"{new_pass}"}}
-            data_mongo.update_one(myquery, newvalues)
+            elif quision == 'password':
+                user_id = int(input('user_id => '))
+                new_pass = input('new password => ')
+                myquery = { "user_id": user_id}
+                newvalues = { "$set": {"password": f"{new_pass}"}}
+                data_mongo.update_one(myquery, newvalues)
 
-        elif quision == 'country':
-            user_id = int(input('user_id => '))
-            new_sity = input('new country => ')
-            myquery = { "user_id": user_id}
-            newvalues = { "$set": {"country": f"{new_sity}"}}
-            data_mongo.update_one(myquery, newvalues)
+            elif quision == 'country':
+                user_id = int(input('user_id => '))
+                new_sity = input('new country => ')
+                myquery = { "user_id": user_id}
+                newvalues = { "$set": {"country": f"{new_sity}"}}
+                data_mongo.update_one(myquery, newvalues)
+                
+        except ValueError as ev:
+            print(f'error => {ev}')
+        except EOFError as er:
+            print(f'error => {er}')
+        finally:
+            print('sucess change')
 
-        else:
-            print('not found please try agian')    
 
+
+            print('success change'.title())
+        
     def drop_admin():
         try:
             user_id = input('put here user_id or name => '.strip())
@@ -240,13 +272,31 @@ class admin(market):
         finally:
             print('succes delet')
 
-    def drop_phone():
-        user_id = input('put here user_id or name => '.strip())
-        if user_id == int:
-            phones.delete_one({'user_id':user_id})
+    def drop_ID():
+        try:
+            object_1 = input('object_id => '.title())
+            aa = ObjectId(object_1)
+            phones.delete_one({'_id':aa})
+        except EOFError as er:
+            print(f'error => {er}')
+        finally:
+            print('success delet')
 
+    def drop_phone():
+        try:
+            user_id = int(input('put here user_id => '.strip()))
+            phones.delete_one({'user_id':user_id})
+        except EOFError as er:
+            print('error => er')
+        finally:
+            print('sucess delet'.title())
+
+    def drop_laptop():
+        user_id = input('put here laptop_ID => '.strip())
+        if user_id == int:
+            laptop.delete_one({'laptop_ID':user_id})
         else:
-            phones.delete_one({'name':f"{user_id}"})
+            exit()
             
     def comment_help():
         commint = sqlite_db.rebot
@@ -278,7 +328,7 @@ class admin(market):
 
     def update_phones():
         try:
-            print(frame_phone_all.to_string())
+            print(df_all_phone.to_string())
             id_find = input('user_id => ')
             new_pp = input('put any you want change => ')
             new_value = input('new value => ')
@@ -294,7 +344,7 @@ class admin(market):
 
     def update_lab():
         try:
-            print(frame_all_data_lab.to_string())
+            print(df_all_lap.to_string())
             id_find = input('laptop_ID => ')
             new_pp = input('put any you want change => ')
             new_value = input('new value => ')
@@ -309,45 +359,34 @@ class admin(market):
             print('sucess change')
 
     def show_phones():
-        print(frame_phone_all.to_string())
+        print(df_all_phone.to_string())
         market.find_id()
 
-    def anlysis_data_phone():
-        print(frame_phone.info())
-
     def show_lab():
-        print(frame_all_data_lab.to_string())
+        print(df_all_lap.to_string())
         labtob_1.find_lab()
-
-    def anlysis_data_labtob():
-        print(frame_lab.info())
 
 class tool(market):
     def tool_admin():
         while True:
-                list_user_admin = np.array(['age','find hack','(delet or del) (admin or phone)','rebot',
-                                             'all_data (admin or phone)', '(update or change) (admin or phone)',
-                                               'add (admin or phone)', 'update labtob', 'show labtob',
-                                               'anlysis phone'])
+                list_user_admin = np.array(['(age)','(find hack)', '(delet or del (admin or phone or laptop)',
+                                            '(report or comment)', '(all_data (admin or phone or laptop))',
+                                            '(update or change(admin or phone)',
+                                            '(add (admin or phone))', '(update laptop)',
+                                            '(delet (phone object))'])
                 print(list_user_admin)
                 help_1 = input('what can i help you => ')
 
                 if help_1 == 'all_data admin' or help_1 == 'database':
-                    print(frame)
+                    print(df_user)
 
                 elif help_1 == 'change admin' or help_1 == 'update admin':
                     admin.replace()
 
-                elif help_1 == 'update labtob':
+                elif help_1 == 'update laptop':
                     admin.update_lab()
 
-                elif help_1 == 'anlysis phone':
-                    admin.anlysis_data_phone()
-
-                elif help_1 == 'anlysis labtob':
-                    admin.anlysis_data_labtob()
-
-                elif help_1 == 'show labtob':
+                elif help_1 == 'all_data laptop':
                     admin.show_lab()
 
                 elif help_1 == 'find hack':
@@ -361,6 +400,9 @@ class tool(market):
 
                 elif help_1 == 'delet phone' or help_1 == 'del phone':
                     admin.drop_phone()
+
+                elif help_1 == 'delet laptop' or help_1 == 'del laptop':
+                    admin.drop_laptop()
 
                 elif help_1 == 'report' or help_1 == 'comment':
                     admin.comment_help()
@@ -378,10 +420,13 @@ class tool(market):
                     admin.show_phones()
 
                 elif help_1 == 'find phone' or help_1 == 'search':
-                    market.serach()
+                    market.search_phone()
 
                 elif help_1 == 'add admin':
                     admin.insert_test_doc()
+
+                elif help_1 == 'delet phone object':
+                        admin.drop_ID()
 
                 elif help_1 == 'close' or help_1 == 'cls':
                     exit()
@@ -391,45 +436,50 @@ class tool(market):
                     break
 
     def tool_clint():
-            elc = input('phones or labtob => '.title())
+            elc = input('phones or laptop => '.title())
             while True:
-                if elc == 'phones' or elc == 'phone':
-                    list_use_clint = np.array(['all phone','find', 'rebot','find marka & search','report'])
+                if elc == 'phone':
+                    list_use_clint = np.array(['(all phone or phones)','(find marka & search)','(report or comment)'])
                     print(list_use_clint)
+
                     qusison = input('what can halp you => ')
 
                     if qusison == 'all phone' or qusison == 'phones':
                         market.frame_all()
 
-                    elif qusison == 'find':
-                        market.find_id()
-
                     elif qusison == 'find marka' or qusison == 'search':
-                        market.serach()
+                        market.search_phone()
 
-                    elif qusison == 'report':
+                    elif qusison == 'report' or qusison == 'comment':
                         market.rebot_clint()
+
+                    elif qusison == 'close' or qusison == 'cls':
+                        exit()
 
                     else:
                         print("i can't understand you please try agian".title())
                         break
 
-                elif elc == 'labtob' or elc == 'lab':
-                    list_use_clint = np.array(['all labtob or labtobs','find lab', 'rebot','find marka lab & search lab','report'])
+                elif elc == 'laptop':
+                    list_use_clint = np.array([['(all laptop or laptops)','(find lap)'],
+                                               ['(find marka & search lap)','(report)']])
                     print(list_use_clint)
                     qusison = input('what can halp you => ')
 
-                    if qusison == 'all labtob' or qusison == 'labtobs':
+                    if qusison == 'all laptop' or qusison == 'laptops':
                         labtob_1.all_lab()
 
-                    elif qusison == 'find lab':
+                    elif qusison == 'find lap':
                         labtob_1.find_lab()
 
-                    elif qusison == 'find marka lab' or qusison == 'search lab':
-                        labtob_1.find_marka()
+                    elif qusison == 'find marka' or qusison == 'search lap':
+                        labtob_1.search_laptop()
 
                     elif qusison == 'report':
                         market.rebot_clint()
+
+                    elif qusison == 'close' or qusison == 'cls':
+                        exit()
 
                     else:
                         print("i can't understand you please try agian".title())
@@ -443,86 +493,86 @@ while True:
         if knowlage == 'admin':
             user = input('user_name => ')
 
-            if user == frame.iloc[0][2] or user == frame.iloc[1][2]\
-                or user == frame.iloc[2][2] or user == frame.iloc[3][2]\
-                or user == frame.iloc[4][2] or user == frame.iloc[5][2] or user == frame.iloc[6][2]\
-                or user == frame.iloc[7][2] or user == frame.iloc[8][2] or user == frame.iloc[9][2]\
-                or user == frame.iloc[10][2] or user == frame.iloc[11][2] or user == frame.iloc[12][2]\
-                or user == frame.iloc[13][2] or user == frame.iloc[14][2]: 
+            if user == df_user.iloc[0][2] or user == df_user.iloc[1][2]\
+                or user == df_user.iloc[2][2] or user == df_user.iloc[3][2]\
+                or user == df_user.iloc[4][2] or user == df_user.iloc[5][2] or user == df_user.iloc[6][2]\
+                or user == df_user.iloc[7][2] or user == df_user.iloc[8][2] or user == df_user.iloc[9][2]\
+                or user == df_user.iloc[10][2] or user == df_user.iloc[11][2] or user == df_user.iloc[12][2]\
+                or user == df_user.iloc[13][2] or user == df_user.iloc[14][2]: 
 
-                if user == frame.iloc[0][2]:
+                if user == df_user.iloc[0][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[0][7]:
+                    if pass_input == df_user.iloc[0][7]:
                         tool.tool_admin()
 
-                elif user == frame.iloc[1][2]:
+                elif user == df_user.iloc[1][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[1][7]:
+                    if pass_input == df_user.iloc[1][7]:
                         tool.tool_admin()
 
-                elif user == frame.iloc[2][2]:
+                elif user == df_user.iloc[2][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[2][7]:
+                    if pass_input == df_user.iloc[2][7]:
                         tool.tool_admin()
 
-                elif user == frame.iloc[3][2]:
+                elif user == df_user.iloc[3][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[3][7]:
+                    if pass_input == df_user.iloc[3][7]:
                         tool.tool_admin()
 
-                elif user == frame.iloc[4][2]:
+                elif user == df_user.iloc[4][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[4][7]:
+                    if pass_input == df_user.iloc[4][7]:
                         tool.tool_admin()
 
-                elif user == frame.iloc[5][2]:
+                elif user == df_user.iloc[5][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[5][7]:
+                    if pass_input == df_user.iloc[5][7]:
                         tool.tool_admin()
 
-                elif user == frame.iloc[6][2]:
+                elif user == df_user.iloc[6][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[6][7]:
+                    if pass_input == df_user.iloc[6][7]:
                         tool.tool_admin()
 
-                elif user == frame.iloc[7][2]:
+                elif user == df_user.iloc[7][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[7][7]:
+                    if pass_input == df_user.iloc[7][7]:
                         tool.tool_admin()
 
-                elif user == frame.iloc[8][2]:
+                elif user == df_user.iloc[8][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[8][7]:
+                    if pass_input == df_user.iloc[8][7]:
                         tool.tool_admin()
 
-                elif user == frame.iloc[9][2]:
+                elif user == df_user.iloc[9][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[9][7]:
+                    if pass_input == df_user.iloc[9][7]:
                         tool.tool_admin()
 
-                elif user == frame.iloc[10][2]:
+                elif user == df_user.iloc[10][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[10][7]:
+                    if pass_input == df_user.iloc[10][7]:
                         tool.tool_admin()
 
-                elif user == frame.iloc[11][2]:
+                elif user == df_user.iloc[11][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[11][7]:
+                    if pass_input == df_user.iloc[11][7]:
                         tool.tool_admin()
 
-                elif user == frame.iloc[12][2]:
+                elif user == df_user.iloc[12][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[12][7]:
+                    if pass_input == df_user.iloc[12][7]:
                         tool.tool_admin()
 
-                elif user == frame.iloc[13][2]:
+                elif user == df_user.iloc[13][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[13][7]:
+                    if pass_input == df_user.iloc[13][7]:
                         tool.tool_admin()
                         
-                elif user == frame.iloc[14][2]:
+                elif user == df_user.iloc[14][2]:
                     pass_input = input('password => ')
-                    if pass_input == frame.iloc[14][7]:
+                    if pass_input == df_user.iloc[14][7]:
                         tool.tool_admin()
                 else:
                     print('wrong password please try agian')
