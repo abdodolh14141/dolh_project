@@ -6,9 +6,10 @@ import numpy as np
 import re
 from bson.objectid import ObjectId
 
-load_dotenv(find_dotenv())
-printer = pprint.PrettyPrinter()
-clint = mongo_client.MongoClient('mongodb+srv://abdodolh14141:abdodolh14141@data.2n75kkb.mongodb.net/test')
+if __name__ == '__main__':
+    load_dotenv(find_dotenv())
+    printer = pprint.PrettyPrinter()
+    clint = mongo_client.MongoClient('mongodb+srv://abdodolh14141:abdodolh14141@data.2n75kkb.mongodb.net/test')
 
 
 sqlite_db = clint.data_clint
@@ -17,7 +18,7 @@ help_frame = data_mongo.find().sort('user_id')
 df_user = pd.DataFrame(help_frame)
 
 
-phones = sqlite_db.new_phone
+phones = sqlite_db.mobile_sqlite3
 all_data = phones.find()
 df_phone = pd.DataFrame(all_data)
 
@@ -30,8 +31,8 @@ class market():
 
     def find_id():
         try:
-            ID_phone = int(input('user_id => '))
-            answer1 = phones.find_one({'user_id':ID_phone})
+            ID_phone = int(input('user_id => ').title())
+            answer1 = phones.find_one({'_id':ID_phone})
 
         except EOFError as er:
             print(f'error => {er}')
@@ -47,10 +48,10 @@ class market():
         market.find_id()
 
     def search_phone():
-        print(df_phone.to_string(index=False, columns=['user_id', 'Brand', 'Model', 'Storage ', 'RAM ']))
+        print(df_phone.to_string(index=False, columns=['_id', 'name', 'rate']))
         find1 = input('marka => ')
-        answer = df_phone.loc[df_phone['Brand'].str.contains(find1, regex=True, flags=re.I)]
-        print(answer.to_string(index=False, columns=['user_id', 'Brand', 'Model', 'Storage ', 'RAM ']))
+        answer = df_phone.loc[df_phone['name'].str.contains(find1, regex=True, flags=re.I)]
+        print(answer.to_string(index=False, columns=['_id', 'name', 'rate']))
         market.find_id()
         
     def rebot_clint():
@@ -71,13 +72,13 @@ class market():
             print(f'error => {er}')
 
         finally:
-            print('sucess')
+            print('sucess report'.title())
 
 class labtob_1(market):
     def find_lab():
         try:
             ID_lap_find = int(input('laptop_ID => '))
-            a = df_lap.iloc[ID_lap_find]
+            answer2 = laptop.find_one({'laptop_ID':ID_lap_find})
 
         except EOFError as er:
             print(f'error => {er}')
@@ -86,7 +87,7 @@ class labtob_1(market):
             print(f'error => {ev}')
 
         finally:
-            printer.pprint(a)
+            printer.pprint(answer2)
 
     def search_laptop():
         print(df_lap.to_string(index=False, columns=['laptop_ID', 'Company', 'Product', 'Cpu', 'Ram', 'Gpu']))
@@ -104,7 +105,6 @@ class labtob_1(market):
 class admin(market):
 
     def insert_test_doc():
-
         try:
 
             userID_input = input('user_id =+> '.title())
@@ -141,7 +141,6 @@ class admin(market):
             print('success add')
 
     def add_phone():
-
         try:
 
             model_new = input('model new phone => ')
@@ -174,28 +173,12 @@ class admin(market):
         finally:
             print('success add phone'.title())
 
-
-    def find_hack():
-        hack = data_mongo.find({'skill' : 'cyber secuirty'})
-        for row in hack:
-            printer.pprint(row)
-
-    def get_age_arange():
-        min_age = int(input('put min age => '.strip()))
-        max_age = int(input('put max age => '.strip()))
-        query = {'$and':[
-            {'age':{'$gte':min_age}},
-            {'age':{'$lte':max_age}}
-        ]}
-        a = data_mongo.find(query).sort('age')
-        for people in a:
-            printer.pprint(people)
-
-
     def replace():
+
         print(df_user.head(50))
         quision = input('changed what => ')
         try:
+
             if quision == 'name':
                 user_id = input('old name => ')
                 new_name = input('new name => ')
@@ -247,76 +230,90 @@ class admin(market):
                 
         except ValueError as ev:
             print(f'error => {ev}')
+
         except EOFError as er:
             print(f'error => {er}')
+
         finally:
-            print('sucess change')
-
-
-
             print('success change'.title())
         
     def drop_admin():
         try:
-            user_id = input('put here user_id or name => '.strip())
-            if user_id == int:
-                data_mongo.delete_one({'user_id':user_id})
-            elif user_id == str:
-                data_mongo.delete_one({'name':f"{user_id}"})
-            else:
-                exit()
+
+            user_id = int(input('put here user_id => '.strip()))
+            data_mongo.delete_one({'user_id':user_id})
+
         except ValueError as ev:
             print(f'error ==> {ev}')
+
         except EOFError as er:
             print(f'error ==> {er}')
+
         finally:
-            print('succes delet')
+            print('succes delet'.title())
 
     def drop_ID():
         try:
+
             object_1 = input('object_id => '.title())
             aa = ObjectId(object_1)
             phones.delete_one({'_id':aa})
+
         except EOFError as er:
             print(f'error => {er}')
+
         finally:
             print('success delet')
 
     def drop_phone():
         try:
+
             user_id = int(input('put here user_id => '.strip()))
             phones.delete_one({'user_id':user_id})
+
         except EOFError as er:
             print('error => er')
+
         finally:
             print('sucess delet'.title())
 
     def drop_laptop():
-        user_id = input('put here laptop_ID => '.strip())
-        if user_id == int:
-            laptop.delete_one({'laptop_ID':user_id})
-        else:
-            exit()
+        try:
+
+            user_id = input('put here laptop_ID => '.strip())
+            laptop.delete_one({'user_id':user_id})
+
+        except EOFError as er:
+            print(f'error => {er}')
+
+        finally:
+            print('sucess delet laptop'.title())
             
     def comment_help():
         commint = sqlite_db.rebot
-        use = ['(write , input) or (read , show)'.title()]
+        use = np.array([['(write , input)'],['(read , show)']])
         print(use)
         comment_help_1 = input("how can i help you problem ==> ".title())
+
         if comment_help_1 == 'show' or comment_help_1 == 'read':
             add_data = commint.find({})
             for row in add_data:
                 printer.pprint(row)
-            delet = input('do you want delet report => ')
+
+            delet = input('do you want delet report => '.title())
+
             if delet == 'yes':
-                name = input('name => ')
-                commint.delete_one({'name':f'{name}'})
+                name = str(input('name => '))
+                commint.delete_one({'name': name})
+
             else:
                 print('okey thanks you')
 
         elif comment_help_1 == 'input' or comment_help_1 == 'write':
+
             name_user22 = input('your name => ')
             rebot = input('put your massage => '.title())
+
             data =  {
                 'report':rebot,
                 'name':name_user22
@@ -328,6 +325,7 @@ class admin(market):
 
     def update_phones():
         try:
+
             print(df_all_phone.to_string())
             id_find = input('user_id => ')
             new_pp = input('put any you want change => ')
@@ -344,6 +342,7 @@ class admin(market):
 
     def update_lab():
         try:
+
             print(df_all_lap.to_string())
             id_find = input('laptop_ID => ')
             new_pp = input('put any you want change => ')
@@ -369,6 +368,7 @@ class admin(market):
 class tool(market):
     def tool_admin():
         while True:
+            
                 list_user_admin = np.array(['(age)','(find hack)', '(delet or del (admin or phone or laptop)',
                                             '(report or comment)', '(all_data (admin or phone or laptop))',
                                             '(update or change(admin or phone)',
